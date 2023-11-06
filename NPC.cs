@@ -16,36 +16,14 @@ namespace Battleships
             if (showNPC)
             {
                 Console.Clear();
-                Console.WriteLine("Admiral " + player.Name + " shoots at " + StringFromCoordinates(whereToShoot));
+                Console.WriteLine("Admiral " + player.Name + " shoots at " + Coordinates.StringFromCoordinates(whereToShoot));
                 Console.WriteLine(OutcomeToString(outcome));
                 Console.WriteLine();
-                ShowMap(player.EnemyMap, whereToShoot);
+                MapPrinter.ShowMap(player.EnemyMap, whereToShoot);
                 Console.ReadKey();
                 Console.Clear();
             }
             return whereToShoot;
-        }
-
-        public static string StringFromInt(int x)
-        {
-            return x switch
-            {
-                0 => "A",
-                1 => "B",
-                2 => "C",
-                3 => "D",
-                4 => "E",
-                5 => "F",
-                6 => "G",
-                7 => "H",
-                8 => "I",
-                _ => "J",
-            };
-        }
-
-        public static string StringFromCoordinates(Tuple<int, int> whereToShoot)
-        {
-            return StringFromInt(whereToShoot.Item1) + whereToShoot.Item2;
         }
 
         private static Tuple<int, int> ChooseWhereToShoot(Map enemyMap)
@@ -101,53 +79,17 @@ namespace Battleships
 
         private static void PredictLines(Map map, double[,] weight, int hitX, int hitY)//we know xy was hit
         {
+            CheckHorizontalLines(map, weight, hitX, hitY, 1);
+            CheckHorizontalLines(map, weight, hitX, hitY, -1);
+            CheckVerticalLines(map, weight, hitX, hitY, 1);
+            CheckVerticalLines(map, weight, hitX, hitY, -1);
+        }
+
+        private static void CheckVerticalLines(Map map, double[,] weight, int hitX, int hitY, int increase)
+        {
             int size = map.Grid.GetLength(0);
             bool endloop = false;//lets me break out of loop inside the switch. ambigous "break" keyword
-            for (int x = hitX + 1; x < size; x++)
-            {
-                if (endloop)
-                {
-                    break;
-                }
-                switch (map.Grid[x, hitY])
-                {
-                    case CellType.Hit:
-                        break;
-
-                    case CellType.Unknown:
-                        weight[x, hitY] += 100;
-                        endloop = true;
-                        break;
-
-                    default:
-                        endloop = true;
-                        break;
-                }
-            }
-            endloop = false;
-            for (int x = hitX - 1; x >= 0; x--)
-            {
-                if (endloop)
-                {
-                    break;
-                }
-                switch (map.Grid[x, hitY])
-                {
-                    case CellType.Hit:
-                        break;
-
-                    case CellType.Unknown:
-                        weight[x, hitY] += 100;
-                        endloop = true;
-                        break;
-
-                    default:
-                        endloop = true;
-                        break;
-                }
-            }
-            endloop = false;
-            for (int y = hitY - 1; y >= 0; y--)
+            for (int y = hitY + increase; y < size && y >= 0; y++)
             {
                 if (endloop)
                 {
@@ -168,20 +110,25 @@ namespace Battleships
                         break;
                 }
             }
-            endloop = false;
-            for (int y = hitY + 1; y < size; y++)
+        }
+
+        private static void CheckHorizontalLines(Map map, double[,] weight, int hitX, int hitY, int increase)
+        {
+            int size = map.Grid.GetLength(0);
+            bool endloop = false;//lets me break out of loop inside the switch. ambigous "break" keyword
+            for (int x = hitX + increase; x < size && x >= 0; x++)
             {
                 if (endloop)
                 {
                     break;
                 }
-                switch (map.Grid[hitX, y])
+                switch (map.Grid[x, hitY])
                 {
                     case CellType.Hit:
                         break;
 
                     case CellType.Unknown:
-                        weight[hitX, y] += 100;
+                        weight[x, hitY] += 100;
                         endloop = true;
                         break;
 

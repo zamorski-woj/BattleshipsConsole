@@ -2,10 +2,10 @@
 {
     public class Ship
     {
-        public int Length { get; set; }
-        public Direction Heading { get; set; }
-        public Tuple<int, int> MainCoordinate { get; set; }
-        public bool Sunken { get; set; } = false;
+        public int Length { get; }
+        public Direction Heading { get; }
+        public Tuple<int, int> MainCoordinate { get; }
+        public bool Sunken { get; private set; } = false;
 
         public Ship(int length, Direction heading, Tuple<int, int> mainCoordinate)//manually
         {

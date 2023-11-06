@@ -1,21 +1,5 @@
 ﻿namespace Battleships
 {
-    public enum CellType
-    {
-        Unknown,
-        Water,
-        Ship,
-        Hit,
-        Sunken
-    }
-
-    public enum Direction
-    {
-        North,
-        East,
-        South,
-        West
-    }
 
     public static class BattleshipsGame
     {
@@ -37,10 +21,12 @@
             player2.EnemyMap = Enemymaps.Item2;
             player.Opponent = player2;
             player2.Opponent = player;
+            player.Fleet.GenerateFleet();
+            player2.Fleet.GenerateFleet();
             return new Tuple<Player, Player>(player, player2);
         }
 
-        public static Tuple<Map, Map> CreateMaps(int size, CellType cellType, Player? player1 = null, Player? player2 = null)
+        private static Tuple<Map, Map> CreateMaps(int size, CellType cellType, Player? player1 = null, Player? player2 = null)
         {
             if (size < 1)
             {
@@ -86,7 +72,7 @@
         private static CellType CheckIfSunken(Map map, Tuple<int, int> where)
         {
             Player mapOwner = map.Owner;
-            Ship whatGotHit = mapOwner.GetShipFromCoordinates(where);
+            Ship whatGotHit = mapOwner.Fleet.GetShipFromCoordinates(where);
             if (whatGotHit != null)
             {
                 return whatGotHit.CheckIfSunken(map);
@@ -111,12 +97,12 @@
                 yCoordinate = random.Next(0, map.Grid.GetLength(1));
                 direction = (Direction)random.Next(0, 4);
             }
-            while (!map.CanPlaceShip(xCoordinate, yCoordinate, direction, length));
+            while (!map.PlacementManager.CanPlaceShip(xCoordinate, yCoordinate, direction, length));
 
             Direction heading = direction;
             var mainCoordinate = new Tuple<int, int>(xCoordinate, yCoordinate);
             Ship s = new(length, heading, mainCoordinate);
-            map.PlaceShip(s);
+            map.PlacementManager.PlaceShip(s);
             return s;
         }
     }

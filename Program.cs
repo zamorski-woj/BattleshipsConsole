@@ -1,6 +1,4 @@
-﻿using Battleships;
-
-namespace BattleshipsConsole
+﻿namespace Battleships
 {
     internal class Program
     {

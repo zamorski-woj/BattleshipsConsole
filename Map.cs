@@ -1,20 +1,24 @@
 ﻿namespace Battleships
 {
+    
     public class Map
     {
-        public CellType[,] Grid { get; set; }
-        public Player Owner { get; set; }
+        public CellType[,] Grid { get; }
+        public Player Owner { get; }
+        public ShipPlacementManager PlacementManager { get; }
 
         public Map(Player p, int size)
         {
             Grid = new CellType[size, size];
             Owner = p;
+            PlacementManager = new(this);
         }
 
         public Map(int size = 10)
         {
             Grid = new CellType[size, size];
             Owner = new Player("Ziutek");
+            PlacementManager = new(this);
         }
 
         public void FillWith(CellType cellType)
@@ -41,38 +45,12 @@
             return true;
         }
 
-        public void PlaceShip(Ship ship)
+        public bool IsOccupied(Tuple<int, int> coord)
         {
-            if (this.CanPlaceShip(ship))
-            {
-                List<Tuple<int, int>> shipCoordinates = ship.GetCoordinates();
-
-                foreach (var coord in shipCoordinates)
-                {
-                    this.Grid[coord.Item1, coord.Item2] = CellType.Ship;
-                }
-                this.Owner?.Fleet.Add(ship);
-            }
+            return this.IsOccupied(coord.Item1, coord.Item2);
         }
 
-        public bool CanPlaceShip(int xCoordinate, int yCoordinate, Direction direction, int length)
-        {
-            Ship ship = new(length, direction, new Tuple<int, int>(xCoordinate, yCoordinate));
-            return this.CanPlaceShip(ship);
-        }
-
-        public bool CanPlaceShip(Ship ship)
-        {
-            List<Tuple<int, int>> shipCoordinates = ship.GetCoordinates();
-            return shipCoordinates.All(coord => !this.Occupied(coord));
-        }
-
-        public bool Occupied(Tuple<int, int> coord)
-        {
-            return this.Occupied(coord.Item1, coord.Item2);
-        }
-
-        public bool Occupied(int x, int y)
+        public bool IsOccupied(int x, int y)
         {
             if (!IsOnMap(new Tuple<int, int>(x, y)))
             {
